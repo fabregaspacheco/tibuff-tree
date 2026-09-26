@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel | Links</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="wrap">
+    <div id="notice" class="notice" hidden></div>
+
+    <!-- Login -->
+    <section id="login-view" class="card" hidden>
+      <h1>Painel</h1>
+      <form id="login-form">
+        <label>E-mail <input type="email" id="email" required autocomplete="username"></label>
+        <label>Senha <input type="password" id="password" required autocomplete="current-password"></label>
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <!-- Editor -->
+    <section id="editor-view" hidden>
+      <div class="topbar">
+        <h1>Painel</h1>
+        <div>
+          <a href="index.html" target="_blank" class="btn">Ver site</a>
+          <button id="logout" class="btn">Sair</button>
+        </div>
+      </div>
+
+      <form id="editor-form">
+        <fieldset class="card">
+          <legend>Perfil</legend>
+          <div class="avatar-row">
+            <img id="avatar-preview" alt="Foto de perfil">
+            <label class="btn">Trocar foto
+              <input type="file" id="avatar-file" accept="image/*" hidden>
+            </label>
+          </div>
+          <label>Nome <input id="p-name" maxlength="60" required></label>
+          <label>Bio <textarea id="p-bio" maxlength="160" rows="2"></textarea></label>
+        </fieldset>
+
+        <fieldset class="card">
+          <legend>Redes sociais (ícones)</legend>
+          <div id="socials-list" class="rows"></div>
+          <button type="button" id="add-social" class="btn">+ Adicionar rede</button>
+        </fieldset>
+
+        <fieldset class="card">
+          <legend>Links</legend>
+          <div id="links-list" class="rows"></div>
+          <button type="button" id="add-link" class="btn">+ Adicionar link</button>
+        </fieldset>
+
+        <button class="primary sticky" type="submit" id="save">Salvar alterações</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

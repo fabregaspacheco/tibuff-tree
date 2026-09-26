@@ -1,32 +1,19 @@
-// ====== EDITE AQUI ======
-const profile = {
-  name: "Seu Nome",
-  bio: "Criador de conteúdo · Desenvolvedor · Café ☕",
-  avatar: "https://i.pravatar.cc/300?img=12", // troque pela sua foto (ex: "foto.jpg")
-};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, isConfigured } from "./firebase-config.js";
+import { defaults } from "./defaults.js";
 
-const socials = [
-  { icon: "📷", url: "https://instagram.com/", label: "Instagram" },
-  { icon: "▶️", url: "https://youtube.com/", label: "YouTube" },
-  { icon: "🐦", url: "https://x.com/", label: "X" },
-  { icon: "✉️", url: "mailto:contato@exemplo.com", label: "E-mail" },
-];
+const external = { target: "_blank", rel: "noopener noreferrer" };
 
-const links = [
-  { icon: "🌐", title: "Meu site", url: "https://exemplo.com" },
-  { icon: "🎥", title: "Meu canal no YouTube", url: "https://youtube.com/" },
-  { icon: "💼", title: "LinkedIn", url: "https://linkedin.com/" },
-  { icon: "💬", title: "Fale comigo no WhatsApp", url: "https://wa.me/5500000000000" },
-  { icon: "🛒", title: "Minha loja", url: "https://exemplo.com/loja" },
-];
-// ========================
-
-document.getElementById("name").textContent = profile.name;
-document.getElementById("bio").textContent = profile.bio;
-const avatar = document.getElementById("avatar");
-avatar.src = profile.avatar;
-document.title = `${profile.name} | Links`;
-document.getElementById("year").textContent = new Date().getFullYear();
+// Só aceita http(s), mailto e tel, para bloquear "javascript:" e similares
+function safeUrl(url) {
+  try {
+    const u = new URL(url, location.href);
+    return ["http:", "https:", "mailto:", "tel:"].includes(u.protocol) ? u.href : "#";
+  } catch {
+    return "#";
+  }
+}
 
 function el(tag, props = {}, text = "") {
   const node = document.createElement(tag);
@@ -35,20 +22,39 @@ function el(tag, props = {}, text = "") {
   return node;
 }
 
-const external = { target: "_blank", rel: "noopener noreferrer" };
+function render({ profile, socials = [], links = [] }) {
+  document.getElementById("name").textContent = profile.name;
+  document.getElementById("bio").textContent = profile.bio;
+  document.getElementById("avatar").src = profile.avatar;
+  document.title = `${profile.name} | Links`;
 
-const socialsBox = document.getElementById("socials");
-socials.forEach(s => {
-  socialsBox.append(el("a", { href: s.url, ariaLabel: s.label, title: s.label, ...external }, s.icon));
-});
+  const socialsBox = document.getElementById("socials");
+  socialsBox.replaceChildren(...socials.map(s =>
+    el("a", { href: safeUrl(s.url), ariaLabel: s.label, title: s.label, ...external }, s.icon)));
 
-const linksBox = document.getElementById("links");
-links.forEach((l, i) => {
-  const a = el("a", { href: l.url, className: "link", ...external });
-  a.style.animationDelay = `${i * 80}ms`;
-  a.append(el("span", { className: "icon" }, l.icon), el("span", { className: "label" }, l.title));
-  linksBox.append(a);
-});
+  const linksBox = document.getElementById("links");
+  linksBox.replaceChildren(...links.map((l, i) => {
+    const a = el("a", { href: safeUrl(l.url), className: "link", ...external });
+    a.style.animationDelay = `${i * 80}ms`;
+    a.append(el("span", { className: "icon" }, l.icon), el("span", { className: "label" }, l.title));
+    return a;
+  }));
+}
+
+async function load() {
+  if (!isConfigured) return defaults;
+  try {
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const snap = await getDoc(doc(db, "site", "main"));
+    return snap.exists() ? { ...defaults, ...snap.data() } : defaults;
+  } catch (err) {
+    console.error("Falha ao carregar do Firebase:", err);
+    return defaults;
+  }
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+load().then(render);
 
 // Tema claro/escuro
 const root = document.documentElement;
