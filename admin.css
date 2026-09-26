@@ -57,3 +57,6 @@ input:focus, textarea:focus { outline: 2px solid #6d5dfc; border-color: transpar
   input, textarea, .btn, .row .actions button { background: #1a1d2b; border-color: #3a3f57; }
   .btn:hover, .row .actions button:hover { background: #262a3d; }
 }
+
+[hidden] { display: none !important; }
+label.btn { display: inline-block; margin: 0; cursor: pointer; }
